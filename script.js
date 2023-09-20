@@ -1,11 +1,14 @@
-var startBtnEl = document.getElementById("startBtn");
-var answerBtn = document.getElementById("answerBtn");
+const startBtn = document.getElementById("startBtn");
+const nextBtn = document.getElementById("nextBtn");
+const questionBox = document.getElementById("questionBox");
+var answerBtnEl = document.getElementById("answerBtn");
 var quizContainer = document.getElementById('quiz');
-var timeEl = document.querySelector("time");
+var timeEl = document.querySelector("#timeEl");
 var resultsContainer = document.getElementById("results");
 var submitButton = document.getElementById("submit");
-var questionsEl = document.querySelector("#questions")
-var submitBtn = document.querySelector("submit-score");
+var questionEl = document.querySelector("#question")
+var submitBtn = document.querySelector("#submit-score");
+let shuffledQuestions, currentQuestionIndex;
 
 var ans1Btn = document.querySelector("#answer1");
 var ans2Btn = document.querySelector("#answer2");
@@ -16,6 +19,13 @@ var ans4Btn = document.querySelector("#answer4");
 let secondsLeft = 60;
 currentScore = 0;
 
+//startBtn.addEventListener("click", startQuiz);
+startBtn.addEventListener("click", test);
+var testEl = document.getElementById("test")
+function test() {
+    console.log("test")
+    testEl.classList.remove("hide");
+}
 
     //make an array out of user's answers
 var questions = [
@@ -35,7 +45,7 @@ var questions = [
             b: "curly brackets", 
             c: "parentheses", 
             d: "all of the above" },
-        correctAnswer: "a"
+        correct: "a"
     },
     {
         question: "Arrays in JavaScript can be used to store:",
@@ -44,7 +54,7 @@ var questions = [
             b: "other arrays", 
             c: "booleans", 
             d: "all of the above"},
-        correctAnswer: "c"
+        correct: "c"
     },
     {
         question: "String values must be enclosed within this when being assigned to variables.",
@@ -53,7 +63,7 @@ var questions = [
             b: "curly brackets", 
             c: "quotes", 
             d: "parentheses"},
-        correctAnswer: "b"
+        correct: "b"
     },
     {
         question: "A very useful tool used during development and debugging for printing content to the debugger is:",
@@ -62,16 +72,24 @@ var questions = [
             b: "terminal/BASH", 
             c: "for loops", 
             d: "console.log"},
-        correctAnswer: "c"
+        correct: "c"
     },
 
-    addClickListener(document.querySelector("#nextQuestion"), handleNext)
 ]
 
-function startTimer() {
-    let timerInterval = setInterval(function () {
+   var opener = document.querySelector(".opener");
+
+function startQuiz() {
+    console.log("Started quiz");
+    opener.classList.add("hide");
+    shuffledQuestions = questions.sort(() => Math.random() - .5);
+    questionBox.classList.remove("hide");
+    currentQuestionIndex = 0;
+    nextQuestion();
+
+     let timerInterval = setInterval(function () {
          secondsLeft--;
-         secondsLeft.textContent = "Time:${secondsLeft}s";
+         timeEl.textContent = secondsLeft
          if (secondsLeft === 0) {
              clearInterval(timerInterval);
              alert("Time is up!");
@@ -79,43 +97,50 @@ function startTimer() {
      }, 1000);
 }
 
-function startQuiz() {
-    console.log("Started quiz");
-    questionCount = 0;
-
-    startTimer();
-    setQuestion(questionCount)
+function nextQuestion() {
+    console.log("Next question")
+    defaultState()
+    showQuestion(shuffledQuestions(currentQuestionIndex))
 }
 
-function setQuestion(id) {
-    if (id < questions.length) {
-        questionsEl.textContent = questions[id].question;
-        ans1Btn.textContent = questions[id].answers[0];
-        ans2Btn.textContent = questions[id].answers[1];
-        ans3Btn.textContent = questions[id].answers[2];
-        ans4Btn.textContent = questions[id].answers[3];
+function showQuestion(question) {
+    questionEl.innerText = question.question;
+    question.answer.forEach(answer => {
+        const button = document.createElement("button");
+        button.innerText = answer.text;
+        button.classList.add("btn");
+            if (answer === correct) {
+                button.dataset.correct = answer.correct;
+            }
+            button.addEventListener("click", selectAnswer);
+            answerBtnEl.appendChild(button);
+    })
+}
+
+function defaultState() {
+    nextBtn.classList.add("hide");
+    while (answerBtnEl.firstChild){
+        answerBtnEl.removeChild;
+        (answerBtnEl.firstChild);
+    }
+
+}
+
+function chooseAnswer(){
+    const chosenBtn = e.target;
+    const correct = chosenBtn.dataset.correct
+    selectStatusClass(document.body, correct)
+}
+
+function checkAnswer(element, correct) {
+    if (correct) {
+        element.classList.add("correct");
+    } else {
+        element.classList.add("incorrect");
     }
 }
 
-function checkAnswers(event) {
-    event.preventDefault();
-    setTimeout(function () {
-        p.style.display = 'none';
-    }, 1000);
-
-    if (questions[questionCount].correctAnswer === event.target.value) {
-        textContent = "Correct!";
-    } else if (questions[questionCount].correctAnswer !== event.target.value) {
-        secondsLeft = secondsLeft - 10;
-        textContent = "Wrong!";
-    }
-    if (questionCount , questions.length) {
-        questionCount++
-    }
-
-    setQuestion(questionCount)
-}
-
+//add locally
 function addScore() {
     currentScore.innerHTML = "Your score is " + userScore;
     submitBtn.hidden = true;
@@ -133,4 +158,3 @@ function displayScores() {
     }
 }
 
-startBtnEl.addEventListener("click", startQuiz);
